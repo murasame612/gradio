@@ -8,22 +8,21 @@ state = gr.State(initDic)
 
 
 def saveuser(User: str):
-    if state.value["登录"]=="登录":
+    if state.value["登录"]==0:
         if os.path.exists(f"User/{User}"):
             if os.path.isdir(f"User/{User}"):
-                global cur_user
-                cur_user = User
-                return [f"{cur_user}已登录",gr.update(visible=False),gr.update(visible=False),gr.update(visible=True),
+                state.value["user"] = User
+                return [f"{User}已登录",gr.update(visible=False),gr.update(visible=False),gr.update(visible=True),
                         gr.update(visible=False)]
                 #outputs=[user_output,user,user_button,exist_button,deny_button]
         else:
-            button ="注册"
+            state.value["登录"] =1
             return [f"{User} 用户不存在,是否要注册？",gr.update(visible=False),gr.update(value="注册"),gr.update(visible=False),
                     gr.update(visible=True)]
     else:
         os.makedirs(f"user/{User}")
         cur_user = User
-        button = "登录"
+        state.value["登录"] =1
         return [f"{cur_user} 已经注册并登录",gr.update(visible=False),gr.update(visible=False),gr.update(visible=True),
                 gr.update(visible=False)]
 
@@ -33,8 +32,7 @@ def exist():
     #user_b：登录按钮可见，user：登录输入框可见，exist_b：登出按钮不可见，日志输出框：更新为“登出”
 
 def denied():
-    global button
-    button ="登录"
+    state.value["登录"] =1
     return [gr.update(value="登录"),gr.update(visible=False),gr.update(value="已取消"),gr.update(visible=True)]
     #注册（user_button）还原为登录，deny_button隐藏,日记提示取消，输入框再现
 
