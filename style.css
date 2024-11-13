@@ -1,0 +1,58 @@
+/* styles.css */
+.simple-blue-text {
+    color: #1E90FF; /* 深蓝色 */
+    font-size: 24px;
+    font-weight: bold;
+}
+
+/* styles.css */
+.arc-blue-text {
+    color: #1874CD; /* 深蓝色 */
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.blue-button {
+    background-color: #E0F7FA; /* 设置背景颜色 */
+    border-radius: 10px;
+}
+
+.red-button {
+    background-color: 	#FF6A6A; /* 设置背景颜色 */
+    border-radius: 10px;
+}
+
+
+.gr-button {
+    background-color: 	#00FA9A; /* 设置背景颜色 */
+    border-radius: 10px;
+}
+/* styles.css */
+.gr-block {
+    border: 2px solid #1E90FF; /* 边框颜色 */
+    border-radius: 10px; /* 圆角 */
+    padding: 10px; /* 内边距 */
+    margin: 10px 0; /* 外边距 */
+}
+
+/* styles.css */
+.custom-row {
+    border: 2px solid #1E90FF; /* 边框颜色 */
+    border-radius: 10px; /* 圆角 */
+    padding: 10px; /* 内边距 */
+    margin: 10px 0; /* 外边距 */
+    display: flex;
+    flex-wrap: wrap; /* 允许换行 */
+    gap: 10px; /* 元素之间的间距 */
+}
+
+/* styles.css */
+.title-background {
+    background-color: #E0F7FA; /* 淡蓝色背景 */
+    color: #1E90FF; /* 深蓝色文字 */
+    padding: 10px; /* 内边距 */
+    border-radius: 5px; /* 圆角 */
+    font-size: 24px; /* 字体大小 */
+    font-weight: bold; /* 字体加粗 */
+}
+
