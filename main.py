@@ -8,6 +8,10 @@ state = gr.State(initDic)
 
 
 def saveuser(User: str):
+    if User == "" or len(User) >= 10:
+        return [f"{User} 用户名不合法",gr.update(visible=True),gr.update(visible=True),gr.update(visible=False),
+                gr.update(visible=False)]
+
     if state.value["登录"]==0:
         if os.path.exists(f"User/{User}"):
             if os.path.isdir(f"User/{User}"):
@@ -22,7 +26,7 @@ def saveuser(User: str):
     else:
         os.makedirs(f"user/{User}")
         cur_user = User
-        state.value["登录"] =1
+        state.value["登录"] =0
         return [f"{cur_user} 已经注册并登录",gr.update(visible=False),gr.update(visible=False),gr.update(visible=True),
                 gr.update(visible=False)]
 
