@@ -36,7 +36,7 @@ def exist():
     #user_b：登录按钮可见，user：登录输入框可见，exist_b：登出按钮不可见，日志输出框：更新为“登出”
 
 def denied():
-    state.value["登录"] =1
+    state.value["登录"] =0
     return [gr.update(value="登录"),gr.update(visible=False),gr.update(value="已取消"),gr.update(visible=True)]
     #注册（user_button）还原为登录，deny_button隐藏,日记提示取消，输入框再现
 
