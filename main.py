@@ -34,8 +34,11 @@ def save_user(User: str):
 
 
 def exist():
-    return [gr.update(visible=True),gr.update(visible=True),gr.update(visible=False),gr.update(value="已退出登录")]
-    #user_b：登录按钮可见，user：登录输入框可见，exist_b：登出按钮不可见，日志输出框：更新为“登出”
+    return [gr.update(visible=True),#user_b：登录按钮可见
+            gr.update(visible=True),#user：登录输入框可见
+            gr.update(visible=False),#exist_b：登出按钮不可见
+            gr.update(value="已退出登录")]#日志输出框：更新为“登出”
+
 
 def denied():
     state.value["登录"] =0
