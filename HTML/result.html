@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>展示图片</title>
+    <style>
+        .image-container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .image-container img {
+            margin: 10px;
+            max-width: 200px;
+            max-height: 200px;
+        }
+    </style>
+</head>
+<body>
+<h1>图片展示</h1>
+<div class="image-container" id="imageContainer"></div>
+<script>
+    // 图片路径数组
+    const imagePaths = [
+        './user/detected_image.png',
+        // 添加更多图片路径
+    ];
+
+    // 获取图片容器
+    const imageContainer = document.getElementById('imageContainer');
+
+    // 使用for循环依次插入图片
+    for (let i = 0; i < imagePaths.length; i++) {
+        const img = document.createElement('img');
+        img.src = imagePaths[i];
+        imageContainer.appendChild(img);
+    }
+
+    // 刷新页面以显示所有图片
+    window.onload = function() {
+        imageContainer.innerHTML = '';
+        for (let i = 0; i < imagePaths.length; i++) {
+            const img = document.createElement('img');
+            img.src = imagePaths[i];
+            imageContainer.appendChild(img);
+        }
+    };
+</script>
+</body>
+</html>

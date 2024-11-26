@@ -1,0 +1,6 @@
+numpy~=1.24.3
+onnxruntime~=1.17.1
+opencv-python~=4.10.0.84
+shapely~=2.0.5
+pillow~=10.4.0
+gradio~=5.5.0

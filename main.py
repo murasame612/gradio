@@ -1,6 +1,7 @@
 import gradio as gr
 import os
 import exam
+from model import update_images
 
 # 初始化状态字典，包含默认值
 initDic = {"登录" :0,"user":""}
@@ -69,7 +70,7 @@ def denied():
     return [gr.update(value="登录"),gr.update(visible=False),gr.update(value="注册已取消"),gr.update(visible=True),gr.update(value=state.value["user"])]
     #注册（user_button）还原为登录，deny_button隐藏,日记提示取消，输入框再现
 
-with gr.Blocks(title="自动批改",theme="soft",css_paths="style.css") as demo:
+with gr.Blocks(title="自动批改",theme="soft",css="style.css") as demo:
     hidden_user = gr.Textbox("public",visible=True,interactive=False)
     with gr.Row(elem_classes="custom-row"):
     # gr.Markdown("## 欢迎使用自动批改系统")
@@ -94,14 +95,16 @@ with gr.Blocks(title="自动批改",theme="soft",css_paths="style.css") as demo:
             with gr.Column(scale=1):
                 gr.HTML("<h1 class='arc-blue-text'>请在右边上传图像</h1>"
                         "<br>会在下方产生此次上传的识别结果<br>"
-                        "你可以给每个识别结果进行排除错误的<br><br>")
+                        "你可以给排除错误的识别<br><br>")
                 submit_button = gr.Button("上传图片",elem_classes="blue-button")
             
             inputIma=gr.Image(scale=3,height=300)
             result = gr.Image(interactive=False,scale=3,height=300)
         #处理图片并保存图片到User/用户名/image
         submit_button.click(fn= exam.detect,inputs=[inputIma,hidden_user],outputs=result)
-
+        update_button = gr.Button("更新图片")
+        html_output = gr.HTML()
+        update_button.click(fn=update_images,outputs=html_output)
     #存放历史照片，存储路径为User/用户名/image,只有登录后才会出现
     with gr.Tab(label = "历史记录",visible=False):
         with gr.Row():
