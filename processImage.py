@@ -146,7 +146,9 @@ def get_all_file_paths(directory):
             file_paths.append(file_path)
     return file_paths
 
+
 import os
+import json
 
 def generate_html(image_folder, user):
     # 获取图片文件的路径列表
@@ -166,10 +168,19 @@ def generate_html(image_folder, user):
                 flex-direction: column;  /* 让图片垂直排列 */
                 align-items: center;  /* 图片水平居中 */
             }
-            .image-container img {
-                margin: 10px 0;  /* 每张图片上下有间距 */
-                max-width: 100%;  /* 确保图片不会超出容器宽度 */
-                max-height: 150px;  /* 限制图片的最大高度 */
+            .image-item {
+                display: flex;
+                align-items: center;  /* 图片和文本垂直居中 */
+                margin: 10px 0;
+            }
+            .image-item img {
+                margin-right: 20px;  /* 图片和文本之间的间距 */
+                max-width: 150px;  /* 图片宽度限制 */
+                max-height: 150px;  /* 图片高度限制 */
+            }
+            .image-item .text {
+                max-width: 300px;  /* 文本最大宽度 */
+                word-wrap: break-word;  /* 让文本自动换行 */
             }
         </style>
     </head>
@@ -177,10 +188,38 @@ def generate_html(image_folder, user):
     <div class="image-container">
     """
 
-    # 生成每个图片的img标签，图片路径改为Flask的URL路径
+    # 生成每个图片和文本的HTML
     for filename in image_paths:
         image_url = f"http://127.0.0.1:5000/{user}/image/{filename}"  # 使用Flask托管的路径
-        html_content += f'    <img src="{image_url}" alt="{filename}">\n'
+        json_url = f"http://127.0.0.1:5000/{user}/json/{filename.split('.')[0]}.json"  # 假设每张图片对应一个JSON文件，文件名相同
+
+        # 读取对应的JSON文件内容
+        json_filename = os.path.join("user",user,"latest","json", f"{filename.split('.')[0]}.json")
+        print("json_filename:",json_filename)
+        if os.path.exists(json_filename):
+            with open(json_filename, "r", encoding="GBK") as json_file:
+                json_data = json.load(json_file)
+                print(json_data)
+
+                # 假设我们想提取 "description" 字段的内容
+                key = "rec_text"  # 替换为你想提取的字段名
+                if key in json_data:
+                    json_content = json_data[key]
+                else:
+                    json_content = "没有描述信息"  # 如果没有该字段，显示默认信息
+        else:
+            json_content = "没有找到对应的JSON文件"
+
+        # 为每张图片创建一个包含图片和文本的div容器
+        html_content += f"""
+        <div class="image-item">
+            <img src="{image_url}" alt="{filename}">
+            <div class="text">
+                <a href="{json_url}" target="_blank">查看JSON数据</a>
+                <p>{json_content}</p>  <!-- 显示JSON中description字段的内容 -->
+            </div>
+        </div>
+        """
 
     # 关闭HTML标签
     html_content += """
@@ -191,10 +230,12 @@ def generate_html(image_folder, user):
 
     # 保存生成的HTML文件
     html_file_path = os.path.join("user", user, "images_gallery.html")
-    with open(html_file_path, "w") as f:
+    with open(html_file_path, "w", encoding="GBK") as f:
         f.write(html_content)
 
     print("HTML 文件已生成！")
 
     return html_file_path
+
+
 
