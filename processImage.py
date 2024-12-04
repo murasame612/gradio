@@ -148,8 +148,11 @@ def get_all_file_paths(directory):
 
 import os
 
-def generate_html(image_folder,user):
-    image_paths = [os.path.join(image_folder, f) for f in os.listdir(image_folder) if f.endswith(('.jpg', '.jpeg', '.png', '.gif'))]
+def generate_html(image_folder, user):
+    # 获取图片文件的路径列表
+    image_paths = [f for f in os.listdir(image_folder) if f.endswith(('.jpg', '.jpeg', '.png', '.gif'))]
+
+    # 构建HTML内容
     html_content = """
     <!DOCTYPE html>
     <html lang="en">
@@ -160,31 +163,38 @@ def generate_html(image_folder,user):
         <style>
             .image-container {
                 display: flex;
-                flex-wrap: wrap;
+                flex-direction: column;  /* 让图片垂直排列 */
+                align-items: center;  /* 图片水平居中 */
             }
             .image-container img {
-                margin: 5px;
-                max-width: 150px;
-                max-height: 150px;
+                margin: 10px 0;  /* 每张图片上下有间距 */
+                max-width: 100%;  /* 确保图片不会超出容器宽度 */
+                max-height: 150px;  /* 限制图片的最大高度 */
             }
         </style>
     </head>
     <body>
-    <h1>展示所有图片</h1>
     <div class="image-container">
     """
 
-    for path in image_paths:
-        html_content += f'    <img src="{path}" alt="{os.path.basename(path)}">\n'
+    # 生成每个图片的img标签，图片路径改为Flask的URL路径
+    for filename in image_paths:
+        image_url = f"http://127.0.0.1:5000/{user}/image/{filename}"  # 使用Flask托管的路径
+        html_content += f'    <img src="{image_url}" alt="{filename}">\n'
 
+    # 关闭HTML标签
     html_content += """
     </div>
     </body>
     </html>
     """
 
-    with open(os.path.join("user",user,"images_gallery.html"), "w") as f:
+    # 保存生成的HTML文件
+    html_file_path = os.path.join("user", user, "images_gallery.html")
+    with open(html_file_path, "w") as f:
         f.write(html_content)
+
     print("HTML 文件已生成！")
 
-    return os.path.join("user",user,"images_gallery.html")
+    return html_file_path
+
