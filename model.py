@@ -15,6 +15,3 @@ def get_image_paths(user):
     if not os.path.exists(user_dir):
         return []
     return [os.path.join(user_dir, img) for img in os.listdir(user_dir) if img.endswith(('.png', '.jpg', '.jpeg'))]
-
-def update_images():
-    return "<img src=http://127.0.0.1:5000/image/1.png>"

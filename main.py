@@ -1,7 +1,7 @@
 import gradio as gr
 import os
-import exam
-from model import update_images
+import processImage
+from processImage import update_images
 
 # 初始化状态字典，包含默认值
 initDic = {"登录" :0,"user":""}
@@ -101,10 +101,10 @@ with gr.Blocks(title="自动批改",theme="soft",css="style.css") as demo:
             inputIma=gr.Image(scale=3,height=300)
             result = gr.Image(interactive=False,scale=3,height=300)
         #处理图片并保存图片到User/用户名/image
-        submit_button.click(fn= exam.detect,inputs=[inputIma,hidden_user],outputs=result)
+        submit_button.click(fn= processImage.detect,inputs=[inputIma,hidden_user],outputs=result)
         update_button = gr.Button("更新图片")
         html_output = gr.HTML()
-        update_button.click(fn=update_images,outputs=html_output)
+        update_button.click(fn=update_images,inputs = hidden_user,outputs=html_output)
     #存放历史照片，存储路径为User/用户名/image,只有登录后才会出现
     with gr.Tab(label = "历史记录",visible=False):
         with gr.Row():

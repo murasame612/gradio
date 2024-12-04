@@ -91,3 +91,11 @@ def convert_nms2normalized(nms_boxes):
         ret.append(box_points)
     return ret
 
+from PIL import Image
+
+if __name__ == "__main__":
+    nms_boxes = infer_nms_bboxes("model/best_fp16_640.onnx", "user/100_aug_0.jpg")
+    img = draw_nms_boxes(nms_boxes, "user/100_aug_0.jpg")
+    img = Image.fromarray(img)
+    for i in nms_boxes:
+        print(i[:5],i[5]*(180/np.pi))
