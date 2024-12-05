@@ -73,7 +73,7 @@ def process_wrong_image(user: str):
             os.remove(img_path_1)
 
 def convert_wrong_char(equality:str)->list:
-    parts = re.split(r'([÷+\-x=])', equality)
+    parts = re.split(r'([÷+\-x×X=])', equality)
     num_list =["0","1","2","3","4","5","6","7","8","9"]
     trans_table = str.maketrans({
         "/": "1",
@@ -106,38 +106,34 @@ def convert_wrong_char(equality:str)->list:
             if num[-1] not in num_list:
                 num = num[:-1]
         equality_list[i] = num
-    print(equality_list)
     return equality_list
 
 def equality_correct(equal_list:list)->bool:
-    if len(equal_list)!=5:
-        return False
+    print("is_correct?: ",equal_list)
     try:
         a,opr,b,_,res = equal_list
         a,b,res = eval(a),eval(b),eval(res)
     except SyntaxError:
+        return False
+    except ValueError:
         return False
 
     output = False
     theresold = 0.01#容许的误差
     if opr == '+':
         if abs(a+b - res) <= theresold:
+            print(abs(a+b - res))
             output = True
     elif opr == '-':
         if abs(a-b - res) <= theresold:
+            print(abs(a-b - res))
             output = True
-    elif opr == '*':
+    elif opr in ['x',"X","×"]:
         if abs(a*b - res) <= theresold:
+            print(abs(a*b - res))
             output = True
     elif opr == '÷':
         if abs(a/b - res) <= theresold:
+            print(abs(a/b - res))
             output = True
     return output
-
-
-
-
-
-
-if __name__ =="__main__":
-    convert_wrong_char("1÷2=./3.")

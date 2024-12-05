@@ -1,3 +1,5 @@
+import shutil
+
 from PIL import Image
 
 from model import get_all_file_paths
@@ -89,6 +91,8 @@ def detect(image,user):
     if image is None:
         return None
     save_path =os.path.join("./user",user,'image')
+    if os.path.exists(save_path):
+        clear_folder(save_path)
     os.makedirs(save_path,exist_ok=True)
     #image是一个ndarray对象，需要转换为PIL对象，并保存
     pil_image = Image.fromarray(image)
@@ -171,6 +175,16 @@ def generate_html(image_folder, user):
                 max-width: 300px;  /* 文本最大宽度 */
                 word-wrap: break-word;  /* 让文本自动换行 */
             }
+            .correct {
+                border: 2px solid green;  /* 正确时的绿色边框 */
+                padding: 5px;
+                color: green;
+            }
+            .incorrect {
+                border: 2px solid red;  /* 错误时的红色边框 */
+                padding: 5px;
+                color: red;
+            }
         </style>
     </head>
     <body>
@@ -183,8 +197,8 @@ def generate_html(image_folder, user):
         json_url = f"http://127.0.0.1:5000/{user}/json/{filename.split('.')[0]}.json"  # 假设每张图片对应一个JSON文件，文件名相同
 
         # 读取对应的JSON文件内容
-        json_filename = os.path.join("user",user,"latest","json", f"{filename.split('.')[0]}.json")
-        print("json_filename:",json_filename)
+        json_filename = os.path.join("user", user, "latest", "json", f"{filename.split('.')[0]}.json")
+        print("json_filename:", json_filename)
         if os.path.exists(json_filename):
             with open(json_filename, "r", encoding="GBK") as json_file:
                 json_data = json.load(json_file)
@@ -203,6 +217,15 @@ def generate_html(image_folder, user):
                     json_content_c = "没有描述信息"  # 如果没有该字段，显示默认信息
         else:
             json_content = "没有找到对应的JSON文件"
+            json_content_c = "没有找到对应的JSON文件"  # 防止 json_content_c 为空
+
+        # 根据 correct 的值添加对应的 CSS 类
+        if json_content_c == "true":  # 假设是布尔类型的字符串
+            correct_class = "correct"
+        elif json_content_c == "false":
+            correct_class = "incorrect"
+        else:
+            correct_class = ""
 
         # 为每张图片创建一个包含图片和文本的div容器
         html_content += f"""
@@ -211,7 +234,7 @@ def generate_html(image_folder, user):
             <div class="text">
                 <a href="{json_url}" target="_blank">查看JSON数据</a>
                 <p>{json_content}</p>  <!-- 显示JSON中description字段的内容 -->
-                <p>{json_content_c}</p>  <!-- 显示JSON中description字段的内容 -->
+                <p class="{correct_class}">{json_content_c}</p>  <!-- 显示JSON中correct字段的内容，并添加相应样式 -->
             </div>
         </div>
         """
@@ -232,5 +255,16 @@ def generate_html(image_folder, user):
 
     return html_file_path
 
-
+def clear_folder(folder_path):
+    # 确保文件夹存在
+    if os.path.exists(folder_path):
+        # 遍历文件夹中的所有内容
+        for item in os.listdir(folder_path):
+            item_path = os.path.join(folder_path, item)
+            if os.path.isdir(item_path):
+                # 如果是目录，递归清空目录
+                shutil.rmtree(item_path)
+            else:
+                # 如果是文件，直接删除
+                os.remove(item_path)
 
