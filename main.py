@@ -1,7 +1,8 @@
 import gradio as gr
 import os
-import processImage
 from processImage import update_images
+import processImage
+import threading
 
 # 初始化状态字典，包含默认值
 initDic = {"登录" :0,"user":""}
@@ -101,10 +102,10 @@ with gr.Blocks(title="自动批改",theme="soft",css="style.css") as demo:
             inputIma=gr.Image(scale=3,height=300)
             result = gr.Image(interactive=False,scale=3,height=300)
         #处理图片并保存图片到User/用户名/image
-        submit_button.click(fn= processImage.detect,inputs=[inputIma,hidden_user],outputs=result)
-        update_button = gr.Button("更新图片")
         html_output = gr.HTML()
-        update_button.click(fn=update_images,inputs = hidden_user,outputs=html_output)
+        submit_button.click(fn= processImage.detect,inputs=[inputIma,hidden_user],outputs=[result,html_output])
+        # update_button = gr.Button("更新图片")
+        # update_button.click(fn=update_images,inputs = hidden_user,outputs=html_output)
     #存放历史照片，存储路径为User/用户名/image,只有登录后才会出现
     with gr.Tab(label = "历史记录",visible=False):
         with gr.Row():
@@ -113,6 +114,16 @@ with gr.Blocks(title="自动批改",theme="soft",css="style.css") as demo:
         with gr.Row():
             gr.Image()
 
-# 启动 Gradio 界面
-demo.launch(debug=True)
 
+def gradio_main():
+    demo.launch(debug=True)
+
+from static_photo import flask_main
+
+if __name__ == "__main__":
+    gr_thread = threading.Thread(target=gradio_main)
+    flask_thread = threading.Thread(target=flask_main)
+    gr_thread.start()
+    flask_thread.start()
+    flask_thread.join()
+    gr_thread.join()

@@ -1,5 +1,4 @@
 from PIL import Image
-import os
 from nms import draw_nms_boxes, infer_nms_bboxes
 import cv2
 import numpy as np
@@ -100,14 +99,17 @@ def detect(image,user):
     cut_and_save_images(os.path.join(save_path,"detected_image.png"),boxes, save_path)
     #画出检测结果
     result_img = draw_nms_boxes(boxes,os.path.join(save_path,"detected_image.png"))
-    return Image.fromarray(result_img)
+    process_split_image(user)
+    html_out = update_images(user)
+    return Image.fromarray(result_img),html_out
 
 def update_images(user:str):
     """
     更新网页的图片列表
     :return:
     """
-    process_split_image(user)
+    if os.path.exists(os.path.join("./user",user,"images_gallery.html")):
+        os.remove(os.path.join("./user",user,"images_gallery.html"))
     html_path = generate_html(os.path.join("./user",user,"latest","image"),user)
     with open(html_path, 'r', encoding='GBK') as file:
         html_content = file.read()
