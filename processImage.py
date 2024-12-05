@@ -1,8 +1,10 @@
 from PIL import Image
+
+from model import get_all_file_paths
 from nms import draw_nms_boxes, infer_nms_bboxes
 import cv2
 import numpy as np
-from pddocr import ocr_and_save
+from pddocr import ocr_and_save, process_wrong_image
 
 
 def crop_image(img, x, y, w, h):
@@ -100,6 +102,8 @@ def detect(image,user):
     #画出检测结果
     result_img = draw_nms_boxes(boxes,os.path.join(save_path,"detected_image.png"))
     process_split_image(user)
+    #删去错误图像
+    process_wrong_image(user)
     html_out = update_images(user)
     return Image.fromarray(result_img),html_out
 
@@ -130,23 +134,6 @@ def process_split_image(user:str):
     for img_path in file_list[1:]:
         ocr_and_save(user,img_path)
     return "识别完成"
-
-def get_all_file_paths(directory):
-    """
-    获取指定目录下所有文件的路径，递归遍历子目录。
-
-    :param directory: 要遍历的目录路径
-    :return: 包含所有文件路径的列表
-    """
-    file_paths = []  # 存储文件路径的列表
-
-    # 遍历指定目录及其子目录
-    for root, dirs, files in os.walk(directory):
-        for file in files:
-            # 获取文件的完整路径
-            file_path = os.path.join(root, file)
-            file_paths.append(file_path)
-    return file_paths
 
 
 import os
@@ -203,12 +190,17 @@ def generate_html(image_folder, user):
                 json_data = json.load(json_file)
                 print(json_data)
 
-                # 假设我们想提取 "description" 字段的内容
-                key = "rec_text"  # 替换为你想提取的字段名
+                key = "equality"  # 替换为你想提取的字段名
                 if key in json_data:
                     json_content = json_data[key]
                 else:
                     json_content = "没有描述信息"  # 如果没有该字段，显示默认信息
+
+                key = "correct"
+                if key in json_data:
+                    json_content_c = json_data[key]
+                else:
+                    json_content_c = "没有描述信息"  # 如果没有该字段，显示默认信息
         else:
             json_content = "没有找到对应的JSON文件"
 
@@ -219,6 +211,7 @@ def generate_html(image_folder, user):
             <div class="text">
                 <a href="{json_url}" target="_blank">查看JSON数据</a>
                 <p>{json_content}</p>  <!-- 显示JSON中description字段的内容 -->
+                <p>{json_content_c}</p>  <!-- 显示JSON中description字段的内容 -->
             </div>
         </div>
         """

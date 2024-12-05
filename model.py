@@ -15,3 +15,20 @@ def get_image_paths(user):
     if not os.path.exists(user_dir):
         return []
     return [os.path.join(user_dir, img) for img in os.listdir(user_dir) if img.endswith(('.png', '.jpg', '.jpeg'))]
+
+def get_all_file_paths(directory):
+    """
+    获取指定目录下所有文件的路径，递归遍历子目录。
+
+    :param directory: 要遍历的目录路径
+    :return: 包含所有文件路径的列表
+    """
+    file_paths = []  # 存储文件路径的列表
+
+    # 遍历指定目录及其子目录
+    for root, dirs, files in os.walk(directory):
+        for file in files:
+            # 获取文件的完整路径
+            file_path = os.path.join(root, file)
+            file_paths.append(file_path)
+    return file_paths

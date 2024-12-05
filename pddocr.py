@@ -1,9 +1,10 @@
-from copyreg import remove_extension
-
+import json
 import cv2
+from paddle.base.libpaddle.eager.ops.legacy import equal
 from paddlex import create_model
 import os
-
+from model import get_all_file_paths
+import re
 
 def preprocess_image(img_path):
     # 读取图像
@@ -43,4 +44,100 @@ def ocr_and_save(user:str, img_path:str):
         res.save_to_json(os.path.join(save_path, "json", f"{index}.json"))
 
 
+def process_wrong_image(user: str):
+    """
+    对用户的图片进行OCR识别，并保存结果
+    @param user: str, 用户名
+    """
+    # 获取用户最新的图片
+    json_path = os.path.join("./user", user, "latest", "json")
+    json_list = get_all_file_paths(json_path)
 
+    for j in json_list:
+        json_file_path = j
+
+        # 打开文件并读取JSON内容
+        with open(json_file_path, 'r', encoding='GBK') as f:
+            data = json.load(f)
+        text = data["rec_text"]
+        equality = convert_wrong_char(text)
+        data["equality"] = "".join(equality)
+        data["correct"] = equality_correct(equality)
+        with open(json_file_path, 'w') as f:
+            json.dump(data, f, indent=4)
+
+        if data["rec_score"] < 0.7:
+            os.remove(json_file_path)
+            img_path = json_file_path.replace(".json", ".png")
+            img_path_1 = img_path.replace("json", "image")
+            os.remove(img_path_1)
+
+def convert_wrong_char(equality:str)->list:
+    parts = re.split(r'([÷+\-x=])', equality)
+    num_list =["0","1","2","3","4","5","6","7","8","9"]
+    trans_table = str.maketrans({
+        "/": "1",
+        "b": "6",
+        "(": "1",
+        ")": "7",
+        "s": "5",
+        "S": "5",
+        "%": "4",
+        "}": "1",
+        "{": "1",
+        "[": "1",
+        "]": "1",
+        "a": "0",
+        "π": "=",
+        "c": "5",
+        "C": "5",
+        " ":"",
+        ":":".",
+        "D":"0",
+        "O":"0",
+        "o":"0",
+    })
+    equality_list =  [part.strip() for part in parts if part.strip()]
+    for i,num in enumerate(equality_list):
+        num = num.translate(trans_table)
+        if i in [0,2,4]:
+            if num[0] not in num_list:
+                num = num[1:]
+            if num[-1] not in num_list:
+                num = num[:-1]
+        equality_list[i] = num
+    print(equality_list)
+    return equality_list
+
+def equality_correct(equal_list:list)->bool:
+    if len(equal_list)!=5:
+        return False
+    try:
+        a,opr,b,_,res = equal_list
+        a,b,res = eval(a),eval(b),eval(res)
+    except SyntaxError:
+        return False
+
+    output = False
+    theresold = 0.01#容许的误差
+    if opr == '+':
+        if abs(a+b - res) <= theresold:
+            output = True
+    elif opr == '-':
+        if abs(a-b - res) <= theresold:
+            output = True
+    elif opr == '*':
+        if abs(a*b - res) <= theresold:
+            output = True
+    elif opr == '÷':
+        if abs(a/b - res) <= theresold:
+            output = True
+    return output
+
+
+
+
+
+
+if __name__ =="__main__":
+    convert_wrong_char("1÷2=./3.")

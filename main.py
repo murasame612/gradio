@@ -1,8 +1,8 @@
 import gradio as gr
 import os
-from processImage import update_images
 import processImage
 import threading
+from processImage import update_images
 
 # 初始化状态字典，包含默认值
 initDic = {"登录" :0,"user":""}
@@ -116,7 +116,7 @@ with gr.Blocks(title="自动批改",theme="soft",css="style.css") as demo:
 
 
 def gradio_main():
-    demo.launch(debug=True)
+    demo.launch(debug=True,share=True)
 
 from static_photo import flask_main
 
