@@ -1,10 +1,11 @@
 import json
 import cv2
-from paddle.base.libpaddle.eager.ops.legacy import equal
 from paddlex import create_model
 import os
 from model import get_all_file_paths
 import re
+from model import clear_folder
+
 
 def preprocess_image(img_path):
     # 读取图像
@@ -26,12 +27,11 @@ def ocr_and_save(user:str, img_path:str):
 
     @param user: str, 用户名
     @param img_path: str, 图片路径
-    @param index: 编号
     """
     # 创建保存路径
     save_path = os.path.join("./user", user, "latest")
-    os.makedirs(save_path, exist_ok=True)
 
+    os.makedirs(save_path, exist_ok=True)
     # 进行OCR识别
     result_img = preprocess_image(img_path)
     outputs = model.predict(result_img, batch_size=1)
@@ -73,8 +73,11 @@ def process_wrong_image(user: str):
             os.remove(img_path_1)
 
 def convert_wrong_char(equality:str)->list:
+    #替换规则
     parts = re.split(r'([÷+\-x×X=])', equality)
+    #数字序列
     num_list =["0","1","2","3","4","5","6","7","8","9"]
+    #替换表
     trans_table = str.maketrans({
         "/": "1",
         "b": "6",
@@ -96,10 +99,12 @@ def convert_wrong_char(equality:str)->list:
         "D":"0",
         "O":"0",
         "o":"0",
+        't':"4",
     })
     equality_list =  [part.strip() for part in parts if part.strip()]
     for i,num in enumerate(equality_list):
         num = num.translate(trans_table)
+        #如果是数字，清理可能会出现前置或后置非数字字符
         if i in [0,2,4]:
             if num[0] not in num_list:
                 num = num[1:]
@@ -114,8 +119,13 @@ def equality_correct(equal_list:list)->bool:
         a,opr,b,_,res = equal_list
         a,b,res = eval(a),eval(b),eval(res)
     except SyntaxError:
+        print("符号错误于：",equal_list)
         return False
     except ValueError:
+        print("数值错误于：",equal_list)
+        return False
+    except NameError:
+        print("名称错误于：",equal_list)
         return False
 
     output = False

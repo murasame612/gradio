@@ -1,4 +1,6 @@
 import os
+import shutil
+
 
 def generate_html_with_images(image_paths):
     html_content = '<div class="image-container">'
@@ -32,3 +34,16 @@ def get_all_file_paths(directory):
             file_path = os.path.join(root, file)
             file_paths.append(file_path)
     return file_paths
+
+def clear_folder(folder_path):
+    # 确保文件夹存在
+    if os.path.exists(folder_path):
+        # 遍历文件夹中的所有内容
+        for item in os.listdir(folder_path):
+            item_path = os.path.join(folder_path, item)
+            if os.path.isdir(item_path):
+                # 如果是目录，递归清空目录
+                shutil.rmtree(item_path)
+            else:
+                # 如果是文件，直接删除
+                os.remove(item_path)
