@@ -139,7 +139,6 @@ def process_split_image(user:str):
 
 import os
 import json
-
 def generate_html(image_folder, user):
     # 获取图片文件的路径列表
     image_paths = [f for f in os.listdir(image_folder) if f.endswith(('.jpg', '.jpeg', '.png', '.gif'))]
@@ -152,9 +151,59 @@ def generate_html(image_folder, user):
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>图片验证</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+                background-color: #f4f4f4;
+            }
+            .container {
+                width: 80%;
+                max-width: 1200px;
+                margin: 0 auto;
+            }
+            .image-item {
+                display: flex;
+                align-items: center;
+                margin-bottom: 20px;
+                border: 1px solid #ddd;
+                padding: 10px;
+                background-color: #fff;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            .image-item img {
+                max-width: 100px;
+                margin-right: 20px;
+                border-radius: 8px;
+            }
+            .image-item .info {
+                flex: 1;
+                margin-right: 20px;
+            }
+            .image-item .correct {
+                margin-right: 20px;
+            }
+            .image-item button {
+                padding: 8px 16px;
+                background-color: #007bff;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                transition: background-color 0.3s;
+            }
+            .image-item button:hover {
+                background-color: #0056b3;
+            }
+        </style>
     </head>
     <body>
-        <div>
+        <div class="container">
     """
 
     # 生成每个图片和文本的HTML
@@ -186,13 +235,17 @@ def generate_html(image_folder, user):
             correct_text = "未知"
             correct_color = "gray"
 
-        # 为每张图片创建一个包含图片和文本的div容器
+        # 为每张图片创建一个包含图片、公式内容、是否正确和按钮的div容器
         html_content += f"""
-        <div style="margin-bottom: 20px;">
-            <img src="{image_url}" alt="{filename}" width="100" style="margin-right: 20px;">
-            <div style="display: inline-block; vertical-align: top;">
+        <div class="image-item">
+            <img src="{image_url}" alt="{filename}">
+            <div class="info">
                 <p>{json_content}</p>  <!-- 显示JSON中equality字段的内容 -->
+            </div>
+            <div class="correct">
                 <p style="color: {correct_color};">{correct_text}</p>  <!-- 显示“正确”或“错误”并添加字体颜色 -->
+            </div>
+            <div>
                 <button onclick="callPythonFunction('{filename}')">调用Python函数</button>
             </div>
         </div>
@@ -200,22 +253,22 @@ def generate_html(image_folder, user):
 
     # 关闭HTML标签
     html_content += """
-    </div>
-    <script>
-        function callPythonFunction(imageName) {
-            console.log('Python function called for ' + imageName);
-            fetch('/call_python_function', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ image_name: imageName })
-            })
-            .then(response => response.json())
-            .then(data => console.log('Response from Python:', data))
-            .catch(error => console.error('Error:', error));
-        }
-    </script>
+        </div>
+        <script>
+            function callPythonFunction(imageName) {
+                console.log('Python function called for ' + imageName);
+                fetch('/call_python_function', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ image_name: imageName })
+                })
+                .then(response => response.json())
+                .then(data => console.log('Response from Python:', data))
+                .catch(error => console.error('Error:', error));
+            }
+        </script>
     </body>
     </html>
     """
@@ -227,4 +280,3 @@ def generate_html(image_folder, user):
 
     print("HTML 文件已生成！")
     return html_file_path
-
