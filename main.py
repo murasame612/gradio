@@ -1,8 +1,9 @@
 import gradio as gr
 import os
+from getSum import gen_ala_html
+import getSum
 import processImage
 import threading
-from processImage import update_images
 
 # 初始化状态字典，包含默认值
 initDic = {"登录" :0,"user":""}
@@ -102,15 +103,20 @@ with gr.Blocks(title="自动批改",theme="soft",css="style.css") as demo:
             inputIma=gr.Image(scale=2,height=300)
             result = gr.Image(interactive=False,scale=2,height=300)
         #处理图片并保存图片到User/用户名/image
+        his_button = gr.Button(value = "已经检查批改内容")
         html_output = gr.HTML()
         submit_button.click(fn= processImage.detect,inputs=[inputIma,hidden_user],outputs=[result,html_output],)
+        his_button.click(fn=getSum.save_in_user,inputs=hidden_user)
     #存放历史照片，存储路径为User/用户名/image,只有登录后才会出现
-    with gr.Tab(label = "历史记录",visible=False):
+    with gr.Tab(label = "历史记录"):
         with gr.Row():
-            gr.Image()
+            gen_button = gr.Button("生成历史记录",elem_classes="blue-button")
     with gr.Tab(label = "分析报告"):
-        with gr.Row():
-            gr.Image()
+            gen_ala_button = gr.Button(value = "生成分析报告",elem_classes="blue-button")
+            ala_html_out = gr.HTML()
+            gen_ala_button.click(fn=gen_ala_html,inputs=hidden_user,outputs=ala_html_out)
+
+
 
 
 def gradio_main():

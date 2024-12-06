@@ -1,7 +1,9 @@
 import json
+
 import cv2
 from paddlex import create_model
 import os
+
 from model import get_all_file_paths
 import re
 from model import clear_folder
@@ -19,9 +21,11 @@ def preprocess_image(img_path):
     resized_img_rgb = cv2.cvtColor(binary_img, cv2.COLOR_GRAY2RGB)
     return resized_img_rgb
 
+
 model = create_model("PP-OCRv4_mobile_rec")
 
-def ocr_and_save(user:str, img_path:str):
+
+def ocr_and_save(user: str, img_path: str):
     """
     进行OCR识别并保存结果和图片到指定用户的latest文件夹
 
@@ -39,7 +43,7 @@ def ocr_and_save(user:str, img_path:str):
     # 保存OCR识别结果
     for res in outputs:
         img_name = os.path.basename(img_path)
-        index,_ = os.path.splitext(img_name)
+        index, _ = os.path.splitext(img_name)
         res.save_to_img(os.path.join(save_path, "image", f"{index}.png"))
         res.save_to_json(os.path.join(save_path, "json", f"{index}.json"))
 
@@ -62,7 +66,14 @@ def process_wrong_image(user: str):
         text = data["rec_text"]
         equality = convert_wrong_char(text)
         data["equality"] = "".join(equality)
-        data["correct"] = equality_correct(equality)
+        is_correct = equality_correct(equality)[0]
+        res = equality_correct(equality)[1]
+        if is_correct == "True":
+            data["correct"] = True
+        else:
+            data["correct"] = False
+
+        data["result"] = res
         with open(json_file_path, 'w') as f:
             json.dump(data, f, indent=4)
 
@@ -72,11 +83,12 @@ def process_wrong_image(user: str):
             img_path_1 = img_path.replace("json", "image")
             os.remove(img_path_1)
 
-def convert_wrong_char(equality:str)->list:
+
+def convert_wrong_char(equality: str) -> list:
     #替换规则
     parts = re.split(r'([÷+\-x×X=])', equality)
     #数字序列
-    num_list =["0","1","2","3","4","5","6","7","8","9"]
+    num_list = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
     #替换表
     trans_table = str.maketrans({
         "/": "1",
@@ -94,18 +106,18 @@ def convert_wrong_char(equality:str)->list:
         "π": "=",
         "c": "5",
         "C": "5",
-        " ":"",
-        ":":".",
-        "D":"0",
-        "O":"0",
-        "o":"0",
-        't':"4",
+        " ": "",
+        ":": ".",
+        "D": "0",
+        "O": "0",
+        "o": "0",
+        't': "4",
     })
-    equality_list =  [part.strip() for part in parts if part.strip()]
-    for i,num in enumerate(equality_list):
+    equality_list = [part.strip() for part in parts if part.strip()]
+    for i, num in enumerate(equality_list):
         num = num.translate(trans_table)
         #如果是数字，清理可能会出现前置或后置非数字字符
-        if i in [0,2,4]:
+        if i in [0, 2, 4]:
             if num[0] not in num_list:
                 num = num[1:]
             if num[-1] not in num_list:
@@ -113,37 +125,45 @@ def convert_wrong_char(equality:str)->list:
         equality_list[i] = num
     return equality_list
 
-def equality_correct(equal_list:list)->bool:
-    print("is_correct?: ",equal_list)
-    try:
-        a,opr,b,_,res = equal_list
-        a,b,res = eval(a),eval(b),eval(res)
-    except SyntaxError:
-        print("符号错误于：",equal_list)
-        return False
-    except ValueError:
-        print("数值错误于：",equal_list)
-        return False
-    except NameError:
-        print("名称错误于：",equal_list)
-        return False
 
-    output = False
-    theresold = 0.01#容许的误差
+def equality_correct(equal_list: list):
+    print("is_correct?: ", equal_list)
+    try:
+        a, opr, b, _, res = equal_list
+        a, b, res = eval(a), eval(b), eval(res)
+    except SyntaxError:
+        print("符号错误于：", equal_list)
+        return "False","识别错误"
+    except ValueError:
+        print("数值错误于：", equal_list)
+        return "False","识别错误"
+    except NameError:
+        print("名称错误于：", equal_list)
+        return "False","识别错误"
+
+    output = "False"
+    sppose = 0
+    theresold = 0.001  #容许的误差
     if opr == '+':
-        if abs(a+b - res) <= theresold:
-            print(abs(a+b - res))
-            output = True
+        sppose = a + b
+        if abs(a + b - res) <= theresold:
+            print(abs(a + b - sppose))
+            output = "True"
     elif opr == '-':
-        if abs(a-b - res) <= theresold:
-            print(abs(a-b - res))
-            output = True
-    elif opr in ['x',"X","×"]:
-        if abs(a*b - res) <= theresold:
-            print(abs(a*b - res))
-            output = True
+        sppose = a - b
+        if abs(a - b - res) <= theresold:
+            print(abs(a - b - res))
+            output = "True"
+    elif opr in ['x', "X", "×"]:
+        sppose = a * b
+        if abs(a * b - res) <= theresold:
+            print(abs(a * b - res))
+            output = "True"
     elif opr == '÷':
-        if abs(a/b - res) <= theresold:
-            print(abs(a/b - res))
-            output = True
-    return output
+        sppose = a / b
+        if abs(a / b - res) <= theresold:
+            print(abs(a / b - sppose))
+            output = "True"
+
+    return output, sppose
+
