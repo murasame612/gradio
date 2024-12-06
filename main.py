@@ -72,7 +72,7 @@ def denied():
     #注册（user_button）还原为登录，deny_button隐藏,日记提示取消，输入框再现
 
 with gr.Blocks(title="自动批改",theme="soft",css="style.css") as demo:
-    hidden_user = gr.Textbox("public",visible=True,interactive=False)
+    hidden_user = gr.Textbox("public",visible=False,interactive=False)
     with gr.Row(elem_classes="custom-row"):
     # gr.Markdown("## 欢迎使用自动批改系统")
         with gr.Column():
@@ -99,13 +99,11 @@ with gr.Blocks(title="自动批改",theme="soft",css="style.css") as demo:
                         "你可以给排除错误的识别<br><br>")
                 submit_button = gr.Button("上传图片",elem_classes="blue-button")
             
-            inputIma=gr.Image(scale=3,height=300)
-            result = gr.Image(interactive=False,scale=3,height=300)
+            inputIma=gr.Image(scale=2,height=300)
+            result = gr.Image(interactive=False,scale=2,height=300)
         #处理图片并保存图片到User/用户名/image
         html_output = gr.HTML()
-        submit_button.click(fn= processImage.detect,inputs=[inputIma,hidden_user],outputs=[result,html_output])
-        # update_button = gr.Button("更新图片")
-        # update_button.click(fn=update_images,inputs = hidden_user,outputs=html_output)
+        submit_button.click(fn= processImage.detect,inputs=[inputIma,hidden_user],outputs=[result,html_output],)
     #存放历史照片，存储路径为User/用户名/image,只有登录后才会出现
     with gr.Tab(label = "历史记录",visible=False):
         with gr.Row():

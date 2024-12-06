@@ -22,6 +22,12 @@ def call_python_function():
     # 可以返回一个响应
     return jsonify({"status": "success", "image_name": image_name})
 
+@app.route('/<user>')
+def show_images(user):
+    html_path = os.path.join("./user",user,"images_gallery.html")
+    with open(html_path, 'r', encoding='utf-8') as file:
+        html_content = file.read()
+    return html_content
 
 if __name__ == '__main__':
     app.run(debug=True)

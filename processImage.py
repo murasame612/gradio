@@ -117,8 +117,22 @@ def update_images(user:str):
     if os.path.exists(os.path.join("./user",user,"images_gallery.html")):
         os.remove(os.path.join("./user",user,"images_gallery.html"))
     html_path = generate_html(os.path.join("./user",user,"latest","image"),user)
-    with open(html_path, 'r', encoding='utf-8') as file:
-        html_content = file.read()
+    # with open(html_path, 'r', encoding='utf-8') as file:
+    #     html_content = file.read()
+    html_content = f"""
+        <!DOCTYPE html>
+    <html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>可点击链接示例</title>
+    </head>
+    <body>
+        <a href="http://127.0.0.1:5000/{user}" target="_blank">访问 {user} 的结果</a>
+    </body>
+    </html>
+    """
+
     return html_content
 
 def process_split_image(user:str):
@@ -139,6 +153,7 @@ def process_split_image(user:str):
 
 import os
 import json
+
 def generate_html(image_folder, user):
     # 获取图片文件的路径列表
     image_paths = [f for f in os.listdir(image_folder) if f.endswith(('.jpg', '.jpeg', '.png', '.gif'))]
@@ -150,57 +165,59 @@ def generate_html(image_folder, user):
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>图片验证</title>
+        <title>结果</title>
         <style>
-            body {
-                font-family: Arial, sans-serif;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                height: 100vh;
-                margin: 0;
-                background-color: #f4f4f4;
-            }
-            .container {
-                width: 80%;
-                max-width: 1200px;
-                margin: 0 auto;
-            }
-            .image-item {
-                display: flex;
-                align-items: center;
-                margin-bottom: 20px;
-                border: 1px solid #ddd;
-                padding: 10px;
-                background-color: #fff;
-                border-radius: 8px;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            }
-            .image-item img {
-                max-width: 100px;
-                margin-right: 20px;
-                border-radius: 8px;
-            }
-            .image-item .info {
-                flex: 1;
-                margin-right: 20px;
-            }
-            .image-item .correct {
-                margin-right: 20px;
-            }
-            .image-item button {
-                padding: 8px 16px;
-                background-color: #007bff;
-                color: white;
-                border: none;
-                border-radius: 4px;
-                cursor: pointer;
-                transition: background-color 0.3s;
-            }
-            .image-item button:hover {
-                background-color: #0056b3;
-            }
-        </style>
+    body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #f4f4f4;
+    }
+    .container {
+        width: 80%;
+        max-width: 1200px;
+        margin: 0 auto;
+        max-height: 80vh;  /* 限制最大高度 */
+        overflow-y: auto;  /* 超过最大高度时启用滑动条 */
+    }
+    .image-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+        border: 1px solid #ddd;
+        padding: 10px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .image-item img {
+        max-width: 100px;
+        margin-right: 20px;
+        border-radius: 8px;
+    }
+    .image-item .info {
+        flex: 1;
+        margin-right: 20px;
+    }
+    .image-item .correct {
+        margin-right: 20px;
+    }
+    .image-item button {
+        padding: 8px 16px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    .image-item button:hover {
+        background-color: #0056b3;
+    }
+</style>
     </head>
     <body>
         <div class="container">
