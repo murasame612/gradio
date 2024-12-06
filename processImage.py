@@ -263,7 +263,7 @@ def generate_html(image_folder, user):
                 <p style="color: {correct_color};">{correct_text}</p>  <!-- 显示“正确”或“错误”并添加字体颜色 -->
             </div>
             <div>
-                <button onclick="callPythonFunction('{filename}')">调用Python函数</button>
+                <button id="button-{filename}" onclick="callPythonFunction('{filename}', this)">调用Python函数</button>
             </div>
         </div>
         """
@@ -272,8 +272,12 @@ def generate_html(image_folder, user):
     html_content += """
         </div>
         <script>
-            function callPythonFunction(imageName) {
+            function callPythonFunction(imageName, button) {
                 console.log('Python function called for ' + imageName);
+                
+                // 隐藏当前按钮
+                button.style.display = 'none';
+                
                 fetch('/call_python_function', {
                     method: 'POST',
                     headers: {
@@ -297,3 +301,4 @@ def generate_html(image_folder, user):
 
     print("HTML 文件已生成！")
     return html_file_path
+
