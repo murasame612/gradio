@@ -117,7 +117,7 @@ def update_images(user:str):
     if os.path.exists(os.path.join("./user",user,"images_gallery.html")):
         os.remove(os.path.join("./user",user,"images_gallery.html"))
     html_path = generate_html(os.path.join("./user",user,"latest","image"),user)
-    with open(html_path, 'r', encoding='GBK') as file:
+    with open(html_path, 'r', encoding='utf-8') as file:
         html_content = file.read()
     return html_content
 
@@ -214,7 +214,7 @@ def generate_html(image_folder, user):
         json_filename = os.path.join("user", user, "latest", "json", f"{filename.split('.')[0]}.json")
         print("json_filename:", json_filename)
         if os.path.exists(json_filename):
-            with open(json_filename, "r", encoding="GBK") as json_file:
+            with open(json_filename, "r", encoding="utf-8") as json_file:
                 json_data = json.load(json_file)
                 print(json_data)
 
@@ -275,7 +275,7 @@ def generate_html(image_folder, user):
 
     # 保存生成的HTML文件
     html_file_path = os.path.join("user", user, "images_gallery.html")
-    with open(html_file_path, "w", encoding="GBK") as f:
+    with open(html_file_path, "w", encoding="utf-8") as f:
         f.write(html_content)
 
     print("HTML 文件已生成！")

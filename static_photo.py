@@ -17,10 +17,11 @@ def serve_json(user,filename):
 def call_python_function():
     data = request.get_json()
     image_name = data.get('image_name')
-    # ¸ù¾İ´«µİµÄÍ¼Æ¬Ãû³ÆÖ´ĞĞÏàÓ¦µÄ Python º¯Êı
+    # æ ¹æ®ä¼ é€’çš„å›¾ç‰‡åç§°æ‰§è¡Œç›¸åº”çš„ Python å‡½æ•°
     print(f"Python function called for {image_name}")
-    # ¿ÉÒÔ·µ»ØÒ»¸öÏìÓ¦
+    # å¯ä»¥è¿”å›ä¸€ä¸ªå“åº”
     return jsonify({"status": "success", "image_name": image_name})
+
 
 if __name__ == '__main__':
     app.run(debug=True)
