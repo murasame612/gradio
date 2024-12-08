@@ -108,9 +108,9 @@ with gr.Blocks(title="自动批改",theme="soft",css="style.css") as demo:
         submit_button.click(fn= processImage.detect,inputs=[inputIma,hidden_user],outputs=[result,html_output],)
         his_button.click(fn=getSum.save_in_user,inputs=hidden_user)
     #存放历史照片，存储路径为User/用户名/image,只有登录后才会出现
-    with gr.Tab(label = "历史记录"):
-        with gr.Row():
-            gen_button = gr.Button("生成历史记录",elem_classes="blue-button")
+    # with gr.Tab(label = "历史记录"):
+    #     with gr.Row():
+    #         gen_button = gr.Button("生成历史记录",elem_classes="blue-button")
     with gr.Tab(label = "分析报告"):
             gen_ala_button = gr.Button(value = "生成分析报告",elem_classes="blue-button")
             ala_html_out = gr.HTML()

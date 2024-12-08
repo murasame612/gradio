@@ -267,7 +267,7 @@ def generate_html(image_folder, user):
         elif not correct_value:
             correct_text = "错误"
             correct_color = "red"
-            suppose_result = result
+            suppose_result = "正确答案："+str(result)
         else:
             correct_text = "未知"
             correct_color = "gray"
