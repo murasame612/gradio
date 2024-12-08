@@ -6,7 +6,9 @@ import numpy as np
 from pddocr import ocr_and_save, process_wrong_image
 from model import clear_folder
 
-
+"""
+该文件主要处理的是主页面传入的图片，并进行分割处理，然后生成HTML文件。到flask返回HTML文件
+"""
 def crop_image(img, x, y, w, h):
     # 计算裁剪区域的左上角和右下角
     top_left_x = int(x - w / 2)
@@ -172,6 +174,12 @@ import os
 import json
 
 def generate_html(image_folder, user):
+    """
+    生成展示用户结果的HTML生成器
+    :param image_folder:
+    :param user:
+    :return:
+    """
     # 获取图片文件的路径列表
     image_paths = [f for f in os.listdir(image_folder) if f.endswith(('.jpg', '.jpeg', '.png', '.gif'))]
 

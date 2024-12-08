@@ -2,6 +2,9 @@ import onnxruntime as ort
 import numpy as np
 import cv2  # 用于读取和预处理图片（如果需要）
 
+"""
+ONNX 推理脚本。得到算术框并交给nms脚本处理
+"""
 def load_model(model_path):
     """
     加载 ONNX 模型并返回推理会话。

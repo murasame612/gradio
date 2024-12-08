@@ -1,15 +1,20 @@
 import json
-
 import cv2
 from paddlex import create_model
 import os
-
 from model import get_all_file_paths
 import re
-from model import clear_folder
 
+"""
+该文件主要处理的是文字识别模块的纠错和公式判断结果的存储
+"""
 
 def preprocess_image(img_path):
+    """
+    处理分割的图像
+    :param img_path:
+    :return:
+    """
     # 读取图像
     ima = cv2.imread(img_path)
     denoised_img = cv2.medianBlur(ima, 3)
@@ -85,6 +90,11 @@ def process_wrong_image(user: str):
 
 
 def convert_wrong_char(equality: str) -> list:
+    """
+    将OCR识别的公式中的错误字符转换为正确字符,并返回正确结果的提示
+    :param equality:
+    :return: 一个含有公式字符串还有正确结果的数字型的列表
+    """
     #替换规则
     parts = re.split(r'([÷+\-x×X=])', equality)
     #数字序列
@@ -142,28 +152,28 @@ def equality_correct(equal_list: list):
         return "False","识别错误"
 
     output = "False"
-    sppose = 0
-    theresold = 0.001  #容许的误差
+    suppose = 0 #应当的结果
+    theresold = 0.001  #容许的浮点数误差
     if opr == '+':
-        sppose = a + b
+        suppose = a + b
         if abs(a + b - res) <= theresold:
-            print(abs(a + b - sppose))
+            print(abs(a + b - suppose))
             output = "True"
     elif opr == '-':
-        sppose = a - b
+        suppose = a - b
         if abs(a - b - res) <= theresold:
             print(abs(a - b - res))
             output = "True"
     elif opr in ['x', "X", "×"]:
-        sppose = a * b
+        suppose = a * b
         if abs(a * b - res) <= theresold:
             print(abs(a * b - res))
             output = "True"
     elif opr == '÷':
-        sppose = a / b
+        suppose = a / b
         if abs(a / b - res) <= theresold:
-            print(abs(a / b - sppose))
+            print(abs(a / b - suppose))
             output = "True"
 
-    return output, sppose
+    return output, suppose
 

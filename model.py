@@ -1,7 +1,9 @@
 import os
 import shutil
 
-
+"""
+该文件处理一些文件的寻找和清理操作
+"""
 def generate_html_with_images(image_paths):
     html_content = '<div class="image-container">'
     for path in image_paths:

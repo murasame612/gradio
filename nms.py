@@ -3,6 +3,9 @@ import numpy as np
 import infel
 from shapely.geometry import Polygon
 
+"""
+非极大值抑制（NMS）算法，与processImage.py相协同使用
+"""
 def calculate_iou(box1, box2):
     """
     计算两个旋转矩形框的交并比（IoU）
