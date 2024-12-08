@@ -1,3 +1,5 @@
+import json
+
 from flask import Flask, send_from_directory, send_file, request, jsonify
 import os
 
@@ -17,10 +19,37 @@ def serve_json(user,filename):
 def call_python_function():
     data = request.get_json()
     image_name = data.get('image_name')
-    # ¸ù¾İ´«µİµÄÍ¼Æ¬Ãû³ÆÖ´ĞĞÏàÓ¦µÄ Python º¯Êı
-    print(f"Python function called for {image_name}")
-    # ¿ÉÒÔ·µ»ØÒ»¸öÏìÓ¦
-    return jsonify({"status": "success", "image_name": image_name})
+    user = data.get("user")
+    # æ ¹æ®ä¼ é€’çš„å›¾ç‰‡åç§°æ‰§è¡Œç›¸åº”çš„ Python å‡½æ•°
+    # img_path = os.path.join("./user", user, "latest", "image",image_name)
+    # os.remove(img_path)
+    j_name = image_name.replace(".png", ".json")
+    json_file_path = os.path.join("./user", user, "latest", "json",j_name)
+    with open(json_file_path, 'r', encoding='GBK') as f:
+        data = json.load(f)
+    data["correct"] = True
+    with open(json_file_path, 'w') as f:
+        json.dump(data, f, indent=4)
+
+    print(f"{image_name} correct")
+    # å¯ä»¥è¿”å›ä¸€ä¸ªå“åº”
+    return jsonify({"status": "success", "image_name": image_name,"user":user})
+
+@app.route('/<user>')
+def show_images(user):
+    html_path = os.path.join("./user",user,"images_gallery.html")
+    with open(html_path, 'r', encoding='utf-8') as file:
+        html_content = file.read()
+    return html_content
+
+@app.route('/call_bottom_function', methods=['POST'])
+def call_bottom_function():
+    data = request.get_json()
+    user = data.get("user")
+    print(f"åº•éƒ¨æŒ‰é’®è¢«ç‚¹å‡»ï¼Œå½“å‰ç”¨æˆ·ï¼š{user}")
+
+    # åœ¨è¿™é‡Œæ‰§è¡Œå…·ä½“çš„åŠŸèƒ½
+    return jsonify({"status": "success", "user": user})
 
 if __name__ == '__main__':
     app.run(debug=True)

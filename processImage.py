@@ -117,8 +117,39 @@ def update_images(user:str):
     if os.path.exists(os.path.join("./user",user,"images_gallery.html")):
         os.remove(os.path.join("./user",user,"images_gallery.html"))
     html_path = generate_html(os.path.join("./user",user,"latest","image"),user)
-    with open(html_path, 'r', encoding='GBK') as file:
-        html_content = file.read()
+    # with open(html_path, 'r', encoding='utf-8') as file:
+    #     html_content = file.read()
+    html_content = f"""
+    <!DOCTYPE html>
+    <html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>可点击链接示例</title>
+        <style>
+            body {{
+                font-family: Arial, sans-serif;
+            }}
+            a {{
+                display: inline-block;
+                background-color: #4CAF50; /* 背景色 */
+                color: white; /* 字体颜色 */
+                padding: 10px 20px; /* 内边距 */
+                font-size: 18px; /* 字体大小 */
+                text-decoration: none; /* 去掉下划线 */
+                border-radius: 5px; /* 圆角 */
+                transition: background-color 0.3s ease; /* 背景色过渡效果 */
+            }}
+            a:hover {{
+                background-color: #45a049; /* 鼠标悬停时的背景色 */
+            }}
+        </style>
+    </head>
+    <body>
+        <a href="http://127.0.0.1:5000/{user}" target="_blank">访问 {user} 的结果</a>
+    </body>
+    </html>
+"""
     return html_content
 
 def process_split_image(user:str):
@@ -139,6 +170,7 @@ def process_split_image(user:str):
 
 import os
 import json
+
 def generate_html(image_folder, user):
     # 获取图片文件的路径列表
     image_paths = [f for f in os.listdir(image_folder) if f.endswith(('.jpg', '.jpeg', '.png', '.gif'))]
@@ -150,57 +182,59 @@ def generate_html(image_folder, user):
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>图片验证</title>
+        <title>结果</title>
         <style>
-            body {
-                font-family: Arial, sans-serif;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                height: 100vh;
-                margin: 0;
-                background-color: #f4f4f4;
-            }
-            .container {
-                width: 80%;
-                max-width: 1200px;
-                margin: 0 auto;
-            }
-            .image-item {
-                display: flex;
-                align-items: center;
-                margin-bottom: 20px;
-                border: 1px solid #ddd;
-                padding: 10px;
-                background-color: #fff;
-                border-radius: 8px;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            }
-            .image-item img {
-                max-width: 100px;
-                margin-right: 20px;
-                border-radius: 8px;
-            }
-            .image-item .info {
-                flex: 1;
-                margin-right: 20px;
-            }
-            .image-item .correct {
-                margin-right: 20px;
-            }
-            .image-item button {
-                padding: 8px 16px;
-                background-color: #007bff;
-                color: white;
-                border: none;
-                border-radius: 4px;
-                cursor: pointer;
-                transition: background-color 0.3s;
-            }
-            .image-item button:hover {
-                background-color: #0056b3;
-            }
-        </style>
+    body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #f4f4f4;
+    }
+    .container {
+        width: 80%;
+        max-width: 1200px;
+        margin: 0 auto;
+        max-height: 80vh;  /* 限制最大高度 */
+        overflow-y: auto;  /* 超过最大高度时启用滑动条 */
+    }
+    .image-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+        border: 1px solid #ddd;
+        padding: 10px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .image-item img {
+        max-width: 100px;
+        margin-right: 20px;
+        border-radius: 8px;
+    }
+    .image-item .info {
+        flex: 1;
+        margin-right: 20px;
+    }
+    .image-item .correct {
+        margin-right: 20px;
+    }
+    .image-item button {
+        padding: 8px 16px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    .image-item button:hover {
+        background-color: #0056b3;
+    }
+</style>
     </head>
     <body>
         <div class="container">
@@ -209,17 +243,18 @@ def generate_html(image_folder, user):
     # 生成每个图片和文本的HTML
     for filename in image_paths:
         image_url = f"http://127.0.0.1:5000/{user}/image/{filename}"  # 使用Flask托管的路径
-
+        U = user
         # 读取对应的JSON文件内容
         json_filename = os.path.join("user", user, "latest", "json", f"{filename.split('.')[0]}.json")
         print("json_filename:", json_filename)
         if os.path.exists(json_filename):
-            with open(json_filename, "r", encoding="GBK") as json_file:
+            with open(json_filename, "r", encoding="utf-8") as json_file:
                 json_data = json.load(json_file)
                 print(json_data)
 
                 json_content = json_data.get("equality", "没有描述信息")  # 获取equality字段
-                correct_value = json_data.get("correct", "unknown")  # 获取correct字段
+                correct_value = json_data.get("correct", "unknown")# 获取correct字段
+                result = json_data.get("result", "unknown")  # 获取result字段
         else:
             json_content = "没有找到对应的JSON文件"
             correct_value = "unknown"
@@ -228,13 +263,15 @@ def generate_html(image_folder, user):
         if correct_value:
             correct_text = "正确"
             correct_color = "green"
+            suppose_result = ""
         elif not correct_value:
             correct_text = "错误"
             correct_color = "red"
+            suppose_result = "正确答案："+str(result)
         else:
             correct_text = "未知"
             correct_color = "gray"
-
+            suppose_result = ""
         # 为每张图片创建一个包含图片、公式内容、是否正确和按钮的div容器
         html_content += f"""
         <div class="image-item">
@@ -245,8 +282,11 @@ def generate_html(image_folder, user):
             <div class="correct">
                 <p style="color: {correct_color};">{correct_text}</p>  <!-- 显示“正确”或“错误”并添加字体颜色 -->
             </div>
+            <div class="correct">
+                <p style="color: {correct_color};">{suppose_result}</p>  <!-- 显示“正确”或“错误”并添加字体颜色 -->
+            </div>
             <div>
-                <button onclick="callPythonFunction('{filename}')">调用Python函数</button>
+                <button id="button-{filename}" onclick="callPythonFunction('{filename}', '{U}',this)">该公式计算正确</button>
             </div>
         </div>
         """
@@ -255,17 +295,20 @@ def generate_html(image_folder, user):
     html_content += """
         </div>
         <script>
-            function callPythonFunction(imageName) {
+            function callPythonFunction(imageName,user,button) {
                 console.log('Python function called for ' + imageName);
+                
+                // 隐藏当前按钮
+                button.style.display = 'none';
+                
                 fetch('/call_python_function', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ image_name: imageName })
+                    body: JSON.stringify({  image_name: imageName, user: user })
                 })
                 .then(response => response.json())
-                .then(data => console.log('Response from Python:', data))
                 .catch(error => console.error('Error:', error));
             }
         </script>
@@ -275,8 +318,9 @@ def generate_html(image_folder, user):
 
     # 保存生成的HTML文件
     html_file_path = os.path.join("user", user, "images_gallery.html")
-    with open(html_file_path, "w", encoding="GBK") as f:
+    with open(html_file_path, "w", encoding="utf-8") as f:
         f.write(html_content)
 
     print("HTML 文件已生成！")
     return html_file_path
+
