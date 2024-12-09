@@ -49,3 +49,10 @@ def clear_folder(folder_path):
             else:
                 # 如果是文件，直接删除
                 os.remove(item_path)
+
+def delete_his_json(user:str):
+    if os.path.exists(f"user/{user}/history/his.json"):
+        os.remove(f"user/{user}/history/his.json")
+        return "<p>已删除历史记录</p>"
+    else:
+        return "<p font_colour=\"red\">无历史记录</p>"

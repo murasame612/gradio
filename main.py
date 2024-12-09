@@ -4,6 +4,7 @@ from getSum import gen_ala_html
 import getSum
 import processImage
 import threading
+from model import delete_his_json
 
 # 初始化状态字典，包含默认值
 initDic = {"登录" :0,"user":""}
@@ -113,10 +114,10 @@ with gr.Blocks(title="自动批改",theme="soft",css="style.css") as demo:
     #         gen_button = gr.Button("生成历史记录",elem_classes="blue-button")
     with gr.Tab(label = "分析报告"):
             gen_ala_button = gr.Button(value = "生成分析报告",elem_classes="blue-button")
+            delete_his_button = gr.Button(value = "删除历史记录",elem_classes="red-button")
             ala_html_out = gr.HTML()
             gen_ala_button.click(fn=gen_ala_html,inputs=hidden_user,outputs=ala_html_out)
-
-
+            delete_his_button.click(fn=delete_his_json,inputs=hidden_user,outputs=ala_html_out)
 
 
 def gradio_main():

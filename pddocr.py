@@ -148,13 +148,13 @@ def equality_correct(equal_list: list):
         a, b, res = eval(a), eval(b), eval(res)
     except SyntaxError:
         print("符号错误于：", equal_list)
-        return "False","识别错误"
+        return "False","识别错误","unknown"
     except ValueError:
         print("数值错误于：", equal_list)
-        return "False","识别错误"
+        return "False","识别错误","unknown"
     except NameError:
         print("名称错误于：", equal_list)
-        return "False","识别错误"
+        return "False","识别错误","unknown"
 
     output = "False"
     suppose = 0 #应当的结果
@@ -179,11 +179,11 @@ def equality_correct(equal_list: list):
             print(abs(a * b - res))
             output = "True"
     elif opr == '÷':
-        equal_operator = "minus"
+        equal_operator = "div"
         suppose = a / b
         if abs(a / b - res) <= theresold:
             print(abs(a / b - suppose))
             output = "True"
 
-    return output, suppose,equal_operator
+    return output,suppose,equal_operator
 
