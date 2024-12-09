@@ -71,14 +71,14 @@ def process_wrong_image(user: str):
         text = data["rec_text"]
         equality = convert_wrong_char(text)
         data["equality"] = "".join(equality)
-        is_correct = equality_correct(equality)[0]
-        res = equality_correct(equality)[1]
+        is_correct,res,equality_operator = equality_correct(equality)
         if is_correct == "True":
             data["correct"] = True
         else:
             data["correct"] = False
 
         data["result"] = res
+        data["equality_operator"] = equality_operator
         with open(json_file_path, 'w') as f:
             json.dump(data, f, indent=4)
 
@@ -137,6 +137,11 @@ def convert_wrong_char(equality: str) -> list:
 
 
 def equality_correct(equal_list: list):
+    """
+    返回一个公式是否正确的判断结果，还有公式其他信息的列表
+    :param equal_list:
+    :return:
+    """
     print("is_correct?: ", equal_list)
     try:
         a, opr, b, _, res = equal_list
@@ -153,27 +158,32 @@ def equality_correct(equal_list: list):
 
     output = "False"
     suppose = 0 #应当的结果
+    equal_operator = "unknown"
     theresold = 0.001  #容许的浮点数误差
     if opr == '+':
         suppose = a + b
+        equal_operator = "add"
         if abs(a + b - res) <= theresold:
             print(abs(a + b - suppose))
             output = "True"
     elif opr == '-':
         suppose = a - b
+        equal_operator = "minus"
         if abs(a - b - res) <= theresold:
             print(abs(a - b - res))
             output = "True"
     elif opr in ['x', "X", "×"]:
+        equal_operator = "mul"
         suppose = a * b
         if abs(a * b - res) <= theresold:
             print(abs(a * b - res))
             output = "True"
     elif opr == '÷':
+        equal_operator = "minus"
         suppose = a / b
         if abs(a / b - res) <= theresold:
             print(abs(a / b - suppose))
             output = "True"
 
-    return output, suppose
+    return output, suppose,equal_operator
 
