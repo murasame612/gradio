@@ -27,7 +27,8 @@ def preprocess_image(img_path):
     return resized_img_rgb
 
 
-model = create_model("PP-OCRv4_mobile_rec")
+# model = create_model("PP-OCRv4_mobile_rec")
+model = create_model("best_accuracy/inference")
 
 
 def ocr_and_save(user: str, img_path: str):
@@ -184,6 +185,7 @@ def equality_correct(equal_list: list):
         if abs(a / b - res) <= theresold:
             print(abs(a / b - suppose))
             output = "True"
-
+    if isinstance(suppose, float):
+        suppose = round(suppose, 5)
     return output,suppose,equal_operator
 

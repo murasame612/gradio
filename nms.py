@@ -1,3 +1,4 @@
+
 import cv2
 import numpy as np
 import infel
@@ -65,13 +66,13 @@ def nms(boxes, iou_threshold=0.5, score_threshold=0.7):
 def infer_nms_bboxes(md_path,input_ima_path,iou_threshold=0.5, score_threshold=0.7,d_type='float16',):
     prue_ret = infel.onnxinfer(md_path, input_ima_path,d_type)
     boxes = list(prue_ret[0].T)
-    nms_boxes = nms(boxes,iou_threshold,score_threshold)
-    return nms_boxes
+    nms_boxes_ret = nms(boxes,iou_threshold,score_threshold)
+    return nms_boxes_ret
 
-def draw_nms_boxes(nms_boxes,input_image_path):
+def draw_nms_boxes(nms_boxes_in,input_image_path):
     image = cv2.imread(input_image_path)
     image = cv2.resize(image, (640, 640))
-    for box in nms_boxes:
+    for box in nms_boxes_in:
         x, y, w, h, confidence, angle = box
         angle_deg = angle * (180 / np.pi)  # 将角度从弧度转换为度数
         rect = ((x, y), (w, h), angle_deg)  # 中心点 (x, y)，宽度 w，高度 h，旋转角度 angle
@@ -81,9 +82,9 @@ def draw_nms_boxes(nms_boxes,input_image_path):
         cv2.drawContours(image, [box_points], -1, (0, 255, 0), 2)
     return image
 
-def convert_nms2normalized(nms_boxes):
+def convert_nms2normalized(nms_boxes_in):
     ret = []
-    for box in nms_boxes:
+    for box in nms_boxes_in:
         x, y, w, h, confidence, angle = box
         angle_deg = angle * (180 / np.pi)  # 将角度从弧度转换为度数
         rect = ((x, y), (w, h), angle_deg)  # 中心点 (x, y)，宽度 w，高度 h，旋转角度 angle
